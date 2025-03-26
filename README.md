@@ -1,33 +1,8 @@
-<h1 align="center">ComeBackLuci v1.0</h1>
+<h1 align="center">ComeBackLuci v1.1</h1>
 
-## Tabla de contenidos
-
-- [Descripcion](#descripcion)
-- [Instalacion](#instalacion)
-- [Uso](#uso)
-- [Detalles](#detalles)
-
-## Descripcion
+## Info
 
 ComeBackLuci es un simple keylogger que guarda un registro de las teclas que presiones en la <a href="https://learn.microsoft.com/en-us/dotnet/api/system.io.path.gettemppath?view=net-8.0&tabs=windows">carpeta temporal del sistema(temp)</a> y hara uso de <a href="https://support.discord.com/hc/es/articles/228383668-Introducci%C3%B3n-a-los-webhook">webhooks de discord</a> para enviarte los registros a tu canal de texto preferido
-
-## Instalacion
-
-#### Clona este repositorio
-
-```
-git clone https://github.com/razeleakers/ComeBackLuci.git
-
-```
-
-#### Dependencias
-
-Ve a herramientas -> Administrador de paquetes NuGet -> Consola de administrador de paquetes
-
-```
-Update-Package -Reinstall
-
-```
 
 ## Uso
 
@@ -41,7 +16,7 @@ Update-Package -Reinstall
 
 <i>-Si cierras la ventana o ingresas un webhook invalido/expirado el programa no enviara a ningun lugar los registros, sin embargo se seguiran guardando en el sistema los archivos</i>
 
-<img src="/images/install.png" alt="install">
+<img src="/images/setup.png" alt="setup">
 
 [3] Debes dirigirte a un servidor de discord, crear un webhook y copiar el link
 
@@ -61,9 +36,9 @@ Update-Package -Reinstall
 
 [2.1] El programa enviara los registros como este ejemplo:
 
-<img src="/images/ok.png" alt="ok">
+<img src="/images/done.png" alt="done">
 
-[2.2] Si hubo algun tipo de problema al enviar el archivo(conexion por ejemplo), los registros que no se envien se moveran a una carpeta especial llamada "ErrorFiles", en caso ya vuelva estar disponible el envio de archivos, se comprimira la carpeta "ErrorFiles" y se enviara como este ejemplo:
+[2.2] Si hubo algun tipo de problema al enviar el archivo(conexion por ejemplo), los registros que no se envien se moveran a una carpeta especial llamada "CBL_Error", en caso ya vuelva estar disponible el envio de archivos, se comprimira la carpeta "CBL_Error" y se enviara como este ejemplo:
 
 <img src="/images/error.png" alt="error">
 
