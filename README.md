@@ -2,7 +2,7 @@
 
 ## Info
 
-ComeBackLuci es un simple keylogger que guarda un registro de las teclas que presiones en la <a href="https://learn.microsoft.com/en-us/dotnet/api/system.io.path.gettemppath?view=net-8.0&tabs=windows">carpeta temporal del sistema(temp)</a> y hara uso de <a href="https://support.discord.com/hc/es/articles/228383668-Introducci%C3%B3n-a-los-webhook">webhooks de discord</a> para enviarte los registros a tu canal de texto preferido
+ComeBackLuci es un simple keylogger que guarda un registro de las teclas que presiones en la <a href="https://learn.microsoft.com/en-us/dotnet/api/system.io.path.gettemppath?view=net-8.0&tabs=windows">carpeta temporal del sistema(temp)</a> y hara uso de <a href="https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks">webhooks de discord</a> para enviarte los registros a tu canal de texto preferido
 
 ## Uso
 
