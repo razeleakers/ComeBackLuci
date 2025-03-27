@@ -5,7 +5,7 @@ namespace ComeBackLuci
 {
     public partial class CBL: Form
     {
-        private HookManager hm = null;
+        private HookManager _hm = null;
 
         public CBL()
         {
@@ -39,13 +39,13 @@ namespace ComeBackLuci
                 });
             }
 
-            hm = new HookManager();
-            hm.Subscribe();
+            _hm = new HookManager();
+            _hm.Subscribe();
         }
 
         private void CBL_FormClosing(object sender, FormClosingEventArgs e)
         {
-            hm?.Dispose();
+            _hm?.Dispose();
         }
     }
 }
