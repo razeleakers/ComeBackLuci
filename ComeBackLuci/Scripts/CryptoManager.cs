@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Reflection;
 using System.Security.Cryptography;
 
@@ -13,19 +12,19 @@ namespace ComeBackLuci
         {
             if (string.IsNullOrWhiteSpace(content)) return null;
 
-            var a = Assembly.GetExecutingAssembly().GetName();
+            var a = Assembly.GetExecutingAssembly().GetName().ToString();
 
-            var k = string.Concat(string.Join("-", a.Name.Select(e => $"{(int)e:x4}").ToArray()),"-", string.Join("-", a.Version.ToString().Select(e => $"{(int)e:x4}").ToArray())).ToCharArray();
+            var k = string.Concat(string.Join("-", a.Substring(0,a.Length / 2).Select(e => $"{(int)e:x4}").ToArray()), "-", string.Join("-", a.Substring(a.Length / 2).ToString().Select(e => $"{(int)e:x4}").ToArray())).ToCharArray();
 
             Array.Reverse(k);
 
-            var res = Encrypt(new string(k), content);
+            var res = Encrypt(content, new string(k));
 
             var s = string.Join("-", res.Item2.Select(e => $"{(int)e:x4}").ToArray()).ToCharArray();
 
             Array.Reverse(s);
 
-            var res2 = Encrypt(new string(k),new string(s));
+            var res2 = Encrypt(new string(s), new string(k));
 
             return $"{res.Item1} {res2.Item1} {res2.Item2}";
         }
@@ -43,13 +42,13 @@ namespace ComeBackLuci
             try { st1 = Convert.FromBase64String(data[2]); }
             catch { return null; }
 
-            var a = Assembly.GetExecutingAssembly().GetName();
+            var a = Assembly.GetExecutingAssembly().GetName().ToString();
 
-            var k = string.Concat(string.Join("-", a.Name.Select(e => $"{(int)e:x4}").ToArray()), "-", string.Join("-", a.Version.ToString().Select(e => $"{(int)e:x4}").ToArray())).ToCharArray();
+            var k = string.Concat(string.Join("-", a.Substring(0, a.Length / 2).Select(e => $"{(int)e:x4}").ToArray()), "-", string.Join("-", a.Substring(a.Length / 2).Select(e => $"{(int)e:x4}").ToArray())).ToCharArray();
 
             Array.Reverse(k);
 
-            var res = Decrypt(new string(k), data[1], st1)?.ToCharArray();
+            var res = Decrypt(data[1], new string(k), st1)?.ToCharArray();
 
             if (res == null) return null;
 
@@ -62,20 +61,18 @@ namespace ComeBackLuci
             try { st2 = Convert.FromBase64String(res2); }
             catch { return null; }
 
-            return Decrypt(new string(k), data[0], st2);
+            return Decrypt(data[0], new string(k), st2);
         }
 
-        private static (string, string) Encrypt(string key,string originalText)
+        private static (string, string) Encrypt(string plainText, string key)
         {
-            if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(originalText)) return (null,null);
-
-            byte[] btext = Encoding.Unicode.GetBytes(originalText);
+            if (string.IsNullOrWhiteSpace(plainText) || string.IsNullOrWhiteSpace(key)) return (null,null);
 
             using (Aes aes = Aes.Create())
             {
                 byte[] salt = GenerateSalt(16);
 
-                using (Rfc2898DeriveBytes rfc = new Rfc2898DeriveBytes(key, salt,10000))
+                using (Rfc2898DeriveBytes rfc = new Rfc2898DeriveBytes(key, salt, 10000, HashAlgorithmName.SHA256))
                 {
                     aes.Key = rfc.GetBytes(32);
                     aes.IV = rfc.GetBytes(16);
@@ -85,7 +82,10 @@ namespace ComeBackLuci
                 {
                     using (CryptoStream cs = new CryptoStream(ms, aes.CreateEncryptor(), CryptoStreamMode.Write))
                     {
-                        cs.Write(btext, 0, btext.Length);
+                        using (StreamWriter sw = new StreamWriter(cs))
+                        {
+                            sw.Write(plainText);
+                        }
                     }
 
                    return (Convert.ToBase64String(ms.ToArray()),Convert.ToBase64String(salt));
@@ -93,9 +93,9 @@ namespace ComeBackLuci
             }
         }
 
-        private static string Decrypt(string key,string encryptText, byte[] salt)
+        private static string Decrypt(string encryptText,string key, byte[] salt)
         {
-            if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(encryptText) || salt == null) return null;
+            if (string.IsNullOrWhiteSpace(encryptText) || string.IsNullOrWhiteSpace(key) || salt == null) return null;
 
             byte[] btext;
 
@@ -104,24 +104,25 @@ namespace ComeBackLuci
 
             using (Aes aes = Aes.Create())
             {
-                using (Rfc2898DeriveBytes rfc = new Rfc2898DeriveBytes(key, salt,10000))
+                using (Rfc2898DeriveBytes rfc = new Rfc2898DeriveBytes(key, salt, 10000, HashAlgorithmName.SHA256))
                 {
                     aes.Key = rfc.GetBytes(32);
                     aes.IV = rfc.GetBytes(16);
                 }
 
-                using (MemoryStream ms = new MemoryStream())
+                using (MemoryStream ms = new MemoryStream(btext))
                 {
-                    try
+                    using (CryptoStream cs = new CryptoStream(ms, aes.CreateDecryptor(), CryptoStreamMode.Read))
                     {
-                        using (CryptoStream cs = new CryptoStream(ms, aes.CreateDecryptor(), CryptoStreamMode.Write))
+                        try
                         {
-                            cs.Write(btext, 0, btext.Length);
+                            using (StreamReader sw = new StreamReader(cs))
+                            {
+                                return sw.ReadToEnd();
+                            }
                         }
-
-                        return Encoding.Unicode.GetString(ms.ToArray());
+                        catch { return null; }
                     }
-                    catch { return null; }
                 }
             }
         }

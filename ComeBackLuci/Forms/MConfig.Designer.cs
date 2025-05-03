@@ -101,7 +101,7 @@
             this.BTN_Show.Margin = new System.Windows.Forms.Padding(0);
             this.BTN_Show.Name = "BTN_Show";
             this.BTN_Show.Size = new System.Drawing.Size(45, 23);
-            this.BTN_Show.TabIndex = 6;
+            this.BTN_Show.TabIndex = 3;
             this.BTN_Show.Text = "Show";
             this.BTN_Show.UseVisualStyleBackColor = false;
             this.BTN_Show.Click += new System.EventHandler(this.BTN_Show_Click);
@@ -113,7 +113,7 @@
             this.TB_Password.Name = "TB_Password";
             this.TB_Password.PasswordChar = '*';
             this.TB_Password.Size = new System.Drawing.Size(173, 22);
-            this.TB_Password.TabIndex = 4;
+            this.TB_Password.TabIndex = 2;
             // 
             // label3
             // 
@@ -132,7 +132,7 @@
             this.TB_Email.Location = new System.Drawing.Point(124, 34);
             this.TB_Email.Name = "TB_Email";
             this.TB_Email.Size = new System.Drawing.Size(239, 22);
-            this.TB_Email.TabIndex = 2;
+            this.TB_Email.TabIndex = 1;
             // 
             // panel1
             // 
@@ -157,7 +157,7 @@
             this.BTN_Send.Margin = new System.Windows.Forms.Padding(0);
             this.BTN_Send.Name = "BTN_Send";
             this.BTN_Send.Size = new System.Drawing.Size(167, 29);
-            this.BTN_Send.TabIndex = 6;
+            this.BTN_Send.TabIndex = 4;
             this.BTN_Send.Text = "Send Message";
             this.BTN_Send.UseVisualStyleBackColor = false;
             this.BTN_Send.Click += new System.EventHandler(this.BTN_Send_Click);
@@ -223,7 +223,7 @@
             this.BTN_Save.Margin = new System.Windows.Forms.Padding(0);
             this.BTN_Save.Name = "BTN_Save";
             this.BTN_Save.Size = new System.Drawing.Size(167, 29);
-            this.BTN_Save.TabIndex = 6;
+            this.BTN_Save.TabIndex = 5;
             this.BTN_Save.Text = "Save and Close";
             this.BTN_Save.UseVisualStyleBackColor = false;
             this.BTN_Save.Click += new System.EventHandler(this.BTN_Save_Click);

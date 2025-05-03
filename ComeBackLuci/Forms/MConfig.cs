@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows.Forms;
-using System.Threading.Tasks;
 using ComeBackLuci.Properties;
 
 namespace ComeBackLuci
@@ -19,7 +18,7 @@ namespace ComeBackLuci
             BTN_Show.Text = BTN_Show.Text == "Show" ? "Hide" : "Show";
         }
 
-        private void BTN_Send_Click(object sender, EventArgs e)
+        private async void BTN_Send_Click(object sender, EventArgs e)
         {
             if (InvalidData()) return;
 
@@ -27,25 +26,21 @@ namespace ComeBackLuci
             BTN_Send.Enabled = false;
             BTN_Save.Enabled = false;
 
-            Task t = Task.Run(() =>
+            using (MailManager mm = new MailManager(TB_Email.Text, TB_Password.Text, true))
             {
-                using (MailManager mm = new MailManager(TB_Email.Text, TB_Password.Text, true))
-                {
-                    mm.Send(true);
-                }
-            });
+                await mm.Send(true);
+            }
 
-            t.ContinueWith(task =>
-            {
-                BTN_Send.Text = "Send Message";
-                BTN_Send.Enabled = true;
-                BTN_Save.Enabled = true;
-            },TaskScheduler.FromCurrentSynchronizationContext());
+            BTN_Send.Text = "Send Message";
+            BTN_Send.Enabled = true;
+            BTN_Save.Enabled = true;
         }
 
         private void BTN_Save_Click(object sender, EventArgs e)
         {
             if (InvalidData()) return;
+
+            this.Hide();
 
             Settings.Default.User = CryptoManager.LuciGoHome(TB_Email.Text) ?? string.Empty;
             Settings.Default.Password = CryptoManager.LuciGoHome(TB_Password.Text) ?? string.Empty;
