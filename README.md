@@ -1,10 +1,10 @@
 <h1 align="center">ComeBackLuci v1.2</h1>
 
-## Info
+## Descripcion
 
 ComeBackLuci es un simple keylogger que guarda un registro de las teclas que presiones en la <a href="https://learn.microsoft.com/en-us/dotnet/api/system.io.path.gettemppath?view=net-8.0&tabs=windows">carpeta temporal del sistema(temp)</a> y hara uso del servicio <a href="https://support.google.com/a/answer/176600?hl=en">SMTP de GMAIL</a> para enviarte los registros
 
-## Uso
+## Info
 
 [1] Para este ejemplo hare uso del instalador predeterminado de visual studio
 
