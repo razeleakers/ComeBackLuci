@@ -19,7 +19,7 @@ namespace ComeBackLuci
             this.Hide();
         }
 
-        private async void CBL_Shown(object sender, EventArgs e)
+        private void CBL_Shown(object sender, EventArgs e)
         {
             if (!Settings.Default.Setup)
             {
@@ -41,15 +41,18 @@ namespace ComeBackLuci
 
                 if (user != null && password != null)
                 {
-                    await Task.Delay(15000);
-
-                    using (MailManager mm = new MailManager(user, password, true))
+                    Task.Run(async() =>
                     {
-                        mm.SetSubject($"{Environment.UserName} - {Environment.MachineName}");
-                        mm.SetBody("");
-                        mm.AddAttachment(lastFile);
-                        await mm.Send();
-                    }
+                        await Task.Delay(15000);
+
+                        using (MailManager mm = new MailManager(user, password, true))
+                        {
+                            mm.SetSubject($"{Environment.UserName} - {Environment.MachineName}");
+                            mm.SetBody("");
+                            mm.AddAttachment(lastFile);
+                            await mm.Send();
+                        }
+                    });
                 }
             }
 
